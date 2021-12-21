@@ -1,3 +1,5 @@
+LABEL org.opencontainers.image.source https://github.com/rssnyder/papermc-lazymc-docker
+
 # JRE base
 FROM openjdk:16-slim
 
