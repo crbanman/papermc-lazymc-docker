@@ -6,6 +6,11 @@ on:
     branches: [ master ]
   workflow_dispatch: # Manual trigger
 
+env:
+  MC_VERSION: latest
+  LAZYMC_VERSION: latest
+  PAPER_BUILD: latest
+
 jobs:
   build:
     runs-on: ubuntu-latest
