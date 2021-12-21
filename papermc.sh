@@ -38,7 +38,7 @@ URL=${URL}/builds/${PAPER_BUILD}/downloads/${JAR_NAME}
 if [ "$1" ]
 then
   # Print the versions used
-  echo "$MC_VERSION-$PAPER_BUILD-$LAZYMC_VERSION" | tee ../version
+  echo "$MC_VERSION-$PAPER_BUILD-$LAZYMC_VERSION" | tee version
   exit 0
 fi
 

@@ -40,8 +40,9 @@ jobs:
       
       - name: Get image tag
         run: |
+          mkdir papermc
           sh papermc.sh version
-          echo "IMAGE_TAG=$(cat version | tr -d 'v')" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$(cat papermc/version | tr -d 'v')" >> $GITHUB_ENV
 
       # https://github.com/docker/build-push-action#multi-platform-image
       - name: Build and push to Docker Hub
