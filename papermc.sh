@@ -34,6 +34,14 @@ fi
 JAR_NAME=paper-${MC_VERSION}-${PAPER_BUILD}.jar
 URL=${URL}/builds/${PAPER_BUILD}/downloads/${JAR_NAME}
 
+# Build image tag
+if [ "$1" ]
+then
+  # Print the versions used
+  echo "$LAZYMC_VERSION-$MC_VERSION-$PAPER_BUILD" | tee ../version
+  exit 0
+fi
+
 # Update if necessary
 if [ ! -e ${JAR_NAME} ]
 then
