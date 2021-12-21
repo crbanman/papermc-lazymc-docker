@@ -5,7 +5,7 @@ on:
   push:
     branches: [ master ]
   schedule:
-    - cron: '0 0 * * 0'
+    - cron: '0 0 * * *'
   workflow_dispatch: # Manual trigger
 
 env:
@@ -39,7 +39,7 @@ jobs:
       - name: Get image tag
         run: |
           sh papermc.sh version
-          echo "IMAGE_TAG=$(cat version)" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$(cat version | tr -d 'v')" >> $GITHUB_ENV
 
       # https://github.com/docker/build-push-action#multi-platform-image
       - name: Build and push to Docker Hub
