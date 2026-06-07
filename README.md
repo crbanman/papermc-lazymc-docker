@@ -1,88 +1,100 @@
-# PaperMC Docker w/ `lazymc` 
-This is a Linux Docker image for the PaperMC Minecraft server with `lazymc`.
+# PaperMC Docker with lazymc
 
-PaperMC is an optimized Minecraft server with plugin support (Bukkit, Spigot, Sponge, etc.).
+Linux Docker image for a PaperMC Minecraft server managed by
+[lazymc](https://github.com/timvisee/lazymc).
 
-[lazymc](https://github.com/timvisee/lazymc) is a utility that puts your Minecraft server to rest when idle and wakes it up when players try to connect. This allows the server to not waste resources if nobody is connected.
+PaperMC is an optimized Minecraft server with plugin support. lazymc lets the
+server sleep while idle and wakes it when a player connects.
 
-This image provides a basic PaperMC server. All customizations are left to the user.
-# Usage
-It is assumed that the user has already acquired a working Docker installation. If that is not the case, go do that and come back here when you're done.
-## Command
-With this image, you can create a new PaperMC Minecraft server with one command (note that running said command indicates agreement to the Minecraft EULA). Here is an example:
+This image does not redistribute Minecraft or Paper server files. It downloads
+Paper and lazymc from their official release sources at container startup.
 
-```sudo docker run -p 25565:25565 crbanman/papermc-lazymc```
+## Current Defaults
 
-While this command will work just fine in many cases, it is only the bare minimum required to start a functional server and can be vastly improved by specifying some...
-## Options
-There are several command line options that users may want to specify when utilizing this image. These options are listed below with some brief explanation. An example will be provided with each. In the example, the part that the user can change will be surrounded by angle brackets (`< >`). Remember to *remove the angle brackets* before running the command.
-- Port
-  - This option must be specified. Use port `25565` if you don't know what this is.
-  - Set this to the port number that the server will be accessed from.
-  - If RCON is to be used, this option must be specified a second time for port `25575`.
-  - `-p <12345>:25565`
-  - `-p <12345>:25565 -p <6789>:25575`
-- Volume
-  - Set this to a name for the server's Docker volume (defaults to randomized gibberish).
-  - Alternatively, set this to a path to a folder on your computer.
-  - `-v <my_volume_name>:/papermc`
-  - `-v </path/to/files>:/papermc`
-- Detached
-  - Include this to make the container independent from the current command line.
-  - `-d`
-- Terminal/Console
-  - Include these flags if you want access to the server's command line via `docker attach`.
-  - These flags can be specified separately or as one option.
-  - `-t` and `-i` in any order
-  - `-ti` or `-it`
-- Restart Policy
-  - If you include this, the server will automatically restart if it crashes.
-  - Stopping the server from its console will still stop the container.
-  - It is highly recommended to only stop the server from its console (not via Docker).
-  - `--restart on-failure`
-- Name
-  - Set this to a name for the container (defaults to a couple of random words).
-  - `--name "<my-container-name>"`
+- Base image: `eclipse-temurin:25-jre-noble`
+- Paper download service: `https://fill.papermc.io/v3`
+- Paper channel: `STABLE`
+- lazymc: latest GitHub release
+- Supported image platforms: `linux/amd64`, `linux/arm64`
 
-There is one more command line option, but it is a bit special and deserves its own section.
-### Environment Variables
-Environment variables are options that are specified in the format `-e <NAME>="<VALUE>"` where `<NAME>` is the name of the environment variable and `<VALUE>` is the value that the environment variable is being set to. Please note that setting an evironment variable with no value does not leave it at default; instead, this sets it to an empty string, which may cause issues. This image has four environment variables:
-- Minecraft Version
-  - **Name:** `MC_VERSION`
-  - Set this to the Minecraft version that the server should support.
-  - Note: there must be a PaperMC release for the specified version of Minecraft.
-  - If this is not set, the latest version supported by PaperMC will be used.
-  - Changing this on an existing server will change the version *without wiping the server*.
-  - `-e MC_VERSION="<latest>"`
-- PaperMC Build
-  - **Name:** `PAPER_BUILD`
-  - Set this to the number of the PaperMC build that the server should use (**not the Minecraft version**).
-  - If this is not set, the latest PaperMC build for the specified `MC_VERSION` will be used.
-  - Changing this on an existing server will change the version *without wiping the server*.
-  - `-e PAPER_BUILD="<latest>"`
-- `lazymc` Version
-  - **Name:** `LAZYMC_VERSION`
-  - Set this to the version of `lazymc` you want to use.
-  - If not set, the [latest release](https://github.com/timvisee/lazymc/releases/latest) will be used.
-- RAM
-  - **Name:** `MC_RAM`
-  - Set this to the amount of RAM the server can use.
-  - Must be formatted as a number followed by `M` for "Megabytes" or `G` for "Gigabytes".
-  - If this is not set, Java allocates its own RAM based on total system/container RAM.
-  - `-e MC_RAM="<4G>"`
-- Java options
-  - **Name:** `JAVA_OPTS`
-  - **ADVANCED USERS ONLY**
-  - Set to any additional Java command line options that you would like to include.
-  - By default, this environment variable is set to the empty string.
-  - `-e JAVA_OPTS="<-XX:+UseConcMarkSweepGC -XX:+UseParNewGC>"`
-## Further Setup
-From this point, the server should be configured in the same way as any other Minecraft server. The server's files, including `server.properties`, can be found in the volume that was specified earlier. The port that was specified earlier will probably need to be forwarded as well. For details on how to do this and other such configuration, Google it, because it works the same as any other Minecraft server.
-# Technical
-This project *does **NOT** redistribute the Minecraft server files*. Instead, the (very small) script that is inside of the image, `papermc.sh`, downloads these files from their official sources during installation.
+As of June 7, 2026, Paper's actively supported lines are:
 
-**PLEASE NOTE:** This is an unofficial project. I did not create PaperMC. [This is the official PaperMC website.](https://papermc.io/)
+- `26.1.2`, latest stable build `69`, Java minimum `25`
+- `1.21.11`, latest stable build `132`, Java minimum `21`
 
-## Project Pages
-- [GitHub page](https://github.com/crbanman/papermc-lazymc-docker).
-- [Docker Hub page](https://hub.docker.com/r/crbanman/papermc-lazymc).
+The `latest`, `java25`, and `temurin25` image tags use Java 25 so the default
+`latest` Paper line works. The `java21` and `temurin21` tags default to
+`MC_VERSION=1.21.11` for the older supported Paper line.
+
+Paper 26.1 changed world storage layout. Back up existing worlds before moving
+to 26.1 or newer. After upgrading a world to 26.1, do not expect to downgrade it
+back to an older Paper version.
+
+## Usage
+
+Running this image indicates agreement to the Minecraft EULA.
+
+```sh
+docker run \
+  --name papermc \
+  -p 25565:25565 \
+  -v papermc:/papermc \
+  crbanman/papermc-lazymc
+```
+
+For production servers, pin `MC_VERSION` and `PAPER_BUILD`. The default
+`latest` values can update the server on container restart.
+
+```sh
+docker run \
+  --name papermc \
+  -p 25565:25565 \
+  -v papermc:/papermc \
+  -e MC_VERSION="26.1.2" \
+  -e PAPER_BUILD="69" \
+  -e MC_RAM="4G" \
+  crbanman/papermc-lazymc
+```
+
+## Docker Options
+
+- `-p <host-port>:25565`: publish the Minecraft server port.
+- `-p <host-port>:25575`: publish RCON if you enable it in `server.properties`.
+- `-v <volume-or-path>:/papermc`: persist server files.
+- `-d`: run detached.
+- `-it`: keep an interactive console available for `docker attach`.
+- `--restart on-failure`: restart if the server process crashes.
+- `--name <name>`: set a stable container name.
+
+## Environment Variables
+
+| Name | Default | Description |
+| --- | --- | --- |
+| `MC_VERSION` | `latest` | Paper/Minecraft version. `latest` uses the newest Paper version from the Fill v3 API. |
+| `PAPER_BUILD` | `latest` | Paper build number. `latest` uses the newest build matching `PAPER_CHANNEL`. |
+| `PAPER_CHANNEL` | `STABLE` | Paper release channel to use when `PAPER_BUILD=latest`. |
+| `LAZYMC_VERSION` | `latest` | lazymc GitHub release tag, for example `v0.2.11`. |
+| `MC_RAM` | empty | Sets both `-Xms` and `-Xmx`, for example `4G` or `4096M`. |
+| `JAVA_OPTS` | empty | Extra Java options appended to the server command. |
+| `PAPER_USER_AGENT` | project default | User-Agent sent to Paper's download service. Change this for derived images. |
+
+## Build Args
+
+| Name | Default | Description |
+| --- | --- | --- |
+| `JAVA_VERSION` | `25` | Eclipse Temurin Java major version used in the base image. |
+| `DEFAULT_MC_VERSION` | `latest` | Baked-in default for `MC_VERSION`. |
+
+## Files
+
+Server files live in `/papermc`. Use a Docker volume or host bind mount so
+worlds, plugins, configs, and the generated `lazymc.toml` persist across
+container restarts.
+
+## Links
+
+- [PaperMC](https://papermc.io/)
+- [PaperMC downloads service](https://docs.papermc.io/misc/downloads-service/)
+- [lazymc](https://github.com/timvisee/lazymc)
+- [GitHub repository](https://github.com/crbanman/papermc-lazymc-docker)
+- [Docker Hub repository](https://hub.docker.com/r/crbanman/papermc-lazymc)
