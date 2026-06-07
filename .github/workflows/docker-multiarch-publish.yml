@@ -14,15 +14,6 @@ env:
 jobs:
   buildandpush:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - java-version: "25"
-            default-mc-version: "latest"
-            tag-suffixes: "latest,java25,temurin25"
-          - java-version: "21"
-            default-mc-version: "1.21.11"
-            tag-suffixes: "java21,temurin21"
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -39,26 +30,31 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build image tags
-        id: image-tags
-        env:
-          IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}
-          TAG_SUFFIXES: ${{ matrix.tag-suffixes }}
-        run: |
-          {
-            echo "tags<<EOF"
-            printf '%s' "$TAG_SUFFIXES" | tr ',' '\n' | sed "s|^|$IMAGE_NAME:|"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Build and push to Docker Hub
+      - name: Build and push Java 25 image
         uses: docker/build-push-action@v7
         with:
           context: .
           file: Dockerfile
           platforms: linux/amd64,linux/arm64
           build-args: |
-            JAVA_VERSION=${{ matrix.java-version }}
-            DEFAULT_MC_VERSION=${{ matrix.default-mc-version }}
+            JAVA_VERSION=25
+            DEFAULT_MC_VERSION=latest
           push: true
-          tags: ${{ steps.image-tags.outputs.tags }}
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:java25
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:temurin25
+
+      - name: Build and push Java 21 image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: Dockerfile
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            JAVA_VERSION=21
+            DEFAULT_MC_VERSION=1.21.11
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:java21
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:temurin21
